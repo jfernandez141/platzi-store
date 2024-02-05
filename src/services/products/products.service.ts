@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CreateProductDto, UpdateProductDto } from 'src/dtos/products.dto';
 import { Product } from 'src/entities/produc.entity';
 
 @Injectable()
@@ -25,7 +26,8 @@ export class ProductsService {
     }
     return product;
   }
-  create(payload: any) {
+  create(payload: CreateProductDto) {
+    console.log(payload);
     const newProduct = {
       id: this.counterId,
       ...payload,
@@ -34,13 +36,18 @@ export class ProductsService {
     this.counterId++;
     return newProduct;
   }
-  update(id: number, payload: any) {
-    const product = this.findOne(id);
-    if (product) {
-      const index = this.products.findIndex((iteam) => iteam.id === id);
-      this.products[index] = payload;
-      return this.products[index];
+  update(id: number, payload: UpdateProductDto) {
+    const index = this.products.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      // Verifica si el producto existe en el array
+      const updatedProduct = { ...this.products[index], ...payload }; // Clona el producto y actualiza sus propiedades con el payload
+
+      this.products[index] = updatedProduct; // Reemplaza el producto en el array
+
+      return updatedProduct; // Retorna el producto actualizado
+    } else {
+      return null; // Si el producto no existe, retorna null
     }
-    return null;
   }
 }
